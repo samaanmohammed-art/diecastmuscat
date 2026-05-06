@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Heart, Shield, Sparkles, Truck } from "lucide-react";
-import { SAMPLE_PRODUCTS, getProductById } from "@/lib/sample-products";
+import { fetchProductById, fetchRelatedProducts } from "@/lib/db";
+import type { Product } from "@/types/database";
 import { formatCurrencyOMR } from "@/lib/utils";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductGallery } from "@/components/products/ProductGallery";
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await fetchProductById(id);
   if (!product) {
     return { title: "Product not found — Diecast Muscat" };
   }
@@ -34,16 +35,14 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await fetchProductById(id);
 
   if (!product) {
     notFound();
   }
 
   const features = formatFeatures(product.features);
-  const related = SAMPLE_PRODUCTS.filter(
-    (p) => p.category === product.category && p.id !== product.id
-  ).slice(0, 4);
+  const related = await fetchRelatedProducts(product, 4);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -233,7 +232,7 @@ function ProductTabs({
   product,
   features,
 }: {
-  product: ReturnType<typeof getProductById> & {};
+  product: Product;
   features: string[];
 }) {
   if (!product) return null;

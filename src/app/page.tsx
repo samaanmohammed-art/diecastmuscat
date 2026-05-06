@@ -7,10 +7,10 @@ import { AIRecommendations } from "@/components/home/AIRecommendations";
 import { BrandStory } from "@/components/home/BrandStory";
 import { Newsletter } from "@/components/home/Newsletter";
 import {
-  getFeaturedProducts,
-  getLimitedProducts,
-  SAMPLE_PRODUCTS,
-} from "@/lib/sample-products";
+  fetchFeaturedProducts,
+  fetchLimitedProducts,
+  fetchTopRatedProducts,
+} from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Diecast Muscat — Premium die-cast collectibles, Sultanate of Oman",
@@ -18,17 +18,17 @@ export const metadata: Metadata = {
     "A curated atelier of authenticated 1:18, 1:43 and 1:64 die-cast model collectibles. Hand-delivered across the Sultanate of Oman.",
 };
 
-export default function HomePage() {
-  const featured = getFeaturedProducts(8);
-  const limitedSpotlight = getLimitedProducts(1)[0];
+export default async function HomePage() {
+  const [featured, limited, topRated] = await Promise.all([
+    fetchFeaturedProducts(8),
+    fetchLimitedProducts(1),
+    fetchTopRatedProducts(8),
+  ]);
+  const limitedSpotlight = limited[0];
 
-  // Mock AI recommendations — pseudo-shuffle for variety on each render
-  // (deterministic on server; varies as catalogue changes)
-  const recPool = [...SAMPLE_PRODUCTS]
-    .sort((a, b) => (b.rating - a.rating) || (b.review_count - a.review_count))
-    .slice(0, 8);
-  const recommended = [recPool[1], recPool[3], recPool[5], recPool[7]].filter(
-    (p): p is (typeof recPool)[number] => Boolean(p)
+  // AI recommendations strip — sample 4 from top-rated pool for variety
+  const recommended = [topRated[1], topRated[3], topRated[5], topRated[7]].filter(
+    (p): p is (typeof topRated)[number] => Boolean(p)
   );
 
   return (

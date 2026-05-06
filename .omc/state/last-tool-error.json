@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__Claude_Preview__preview_screenshot",
+  "tool_input_preview": "{\"serverId\":\"a09d65e6-4a57-441c-a69a-0059f9ae265c\"}",
+  "error": "preview_screenshot timed out after 30s. The preview window may be stuck (modal dialog, navigation hang, or unresponsive renderer). Check preview_console_logs for errors.",
+  "timestamp": "2026-05-06T17:09:29.122Z",
+  "retry_count": 1
+}

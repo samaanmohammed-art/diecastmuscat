@@ -2,16 +2,13 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
-import { SAMPLE_PRODUCTS } from "@/lib/sample-products";
-import type { Product, ProductCategory } from "@/types/database";
+import { fetchProducts, type SortKey } from "@/lib/db";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 12;
-
-type SortKey = "newest" | "price-asc" | "price-desc" | "popular";
 
 interface SearchParams {
   category?: string;
@@ -47,63 +44,6 @@ export async function generateMetadata({
   };
 }
 
-function applyFilters(products: Product[], sp: SearchParams): Product[] {
-  let list = [...products];
-
-  if (sp.category && sp.category in CATEGORY_TITLES) {
-    list = list.filter((p) => p.category === (sp.category as ProductCategory));
-  }
-
-  if (sp.scale) {
-    const scales = new Set(sp.scale.split(",").filter(Boolean));
-    if (scales.size > 0) list = list.filter((p) => p.scale && scales.has(p.scale));
-  }
-
-  if (sp.brand) {
-    const brands = new Set(sp.brand.split(",").filter(Boolean));
-    if (brands.size > 0) list = list.filter((p) => p.brand && brands.has(p.brand));
-  }
-
-  if (sp.q) {
-    const q = sp.q.toLowerCase();
-    list = list.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.brand?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.category.includes(q)
-    );
-  }
-
-  if (sp.limited === "1") {
-    list = list.filter((p) => p.is_limited_edition);
-  }
-
-  const min = sp.minPrice ? Number(sp.minPrice) : null;
-  const max = sp.maxPrice ? Number(sp.maxPrice) : null;
-  if (min !== null && !Number.isNaN(min)) list = list.filter((p) => p.price >= min);
-  if (max !== null && !Number.isNaN(max)) list = list.filter((p) => p.price <= max);
-
-  const sort = (sp.sort as SortKey) ?? "newest";
-  switch (sort) {
-    case "price-asc":
-      list.sort((a, b) => a.price - b.price);
-      break;
-    case "price-desc":
-      list.sort((a, b) => b.price - a.price);
-      break;
-    case "popular":
-      list.sort((a, b) => b.rating - a.rating || b.review_count - a.review_count);
-      break;
-    case "newest":
-    default:
-      list.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-      break;
-  }
-
-  return list;
-}
-
 export default async function ProductsPage({
   searchParams,
 }: {
@@ -111,17 +51,28 @@ export default async function ProductsPage({
 }) {
   const sp = await searchParams;
 
-  const filtered = applyFilters(SAMPLE_PRODUCTS, sp);
-  const total = filtered.length;
   const pageNum = Math.max(1, Number(sp.page ?? 1) || 1);
+  const sortValue = (sp.sort as SortKey) ?? "newest";
+
+  const { products: pageItems, total } = await fetchProducts({
+    category: sp.category,
+    scale: sp.scale,
+    brand: sp.brand,
+    q: sp.q,
+    limited: sp.limited,
+    minPrice: sp.minPrice ? Number(sp.minPrice) : null,
+    maxPrice: sp.maxPrice ? Number(sp.maxPrice) : null,
+    sort: sortValue,
+    page: pageNum,
+    limit: PAGE_SIZE,
+  });
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(pageNum, totalPages);
   const start = (safePage - 1) * PAGE_SIZE;
-  const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
   const categoryTitle = sp.category && CATEGORY_TITLES[sp.category];
   const heading = categoryTitle ?? "The Collection";
-  const sortValue = (sp.sort as SortKey) ?? "newest";
 
   return (
     <div className="min-h-screen bg-bg">

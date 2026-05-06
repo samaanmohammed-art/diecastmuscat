@@ -1,18 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getProductById } from "@/lib/sample-products";
+import { fetchProductById } from "@/lib/db";
 
 export async function GET(
   _request: NextRequest,
   ctx: { params: Promise<{ id: string }> }
 ) {
   const { id } = await ctx.params;
-  const product = getProductById(id);
+  const product = await fetchProductById(id);
 
   if (!product) {
-    return NextResponse.json(
-      { error: "Product not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
   return NextResponse.json(
