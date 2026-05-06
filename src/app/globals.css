@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* ===== Diecast Muscat Design Tokens (Tailwind v4 CSS-first) ===== */
+
+@theme {
+  /* Brand palette: luxury obsidian + warm gold */
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-elevated: #161616;
+  --color-border: #1E1E1E;
+  --color-border-strong: #2A2A2A;
+  --color-gold: #D4AF37;
+  --color-gold-bright: #F5CD5B;
+  --color-gold-muted: #9A7D26;
+  --color-text: #F5F5F0;
+  --color-text-muted: #888880;
+  --color-text-dim: #5C5C58;
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+
+  /* Background aliases used by shadcn/ui */
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-popover: var(--color-surface-elevated);
+  --color-popover-foreground: var(--color-text);
+  --color-primary: var(--color-gold);
+  --color-primary-foreground: #000;
+  --color-secondary: var(--color-surface-elevated);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-accent: var(--color-gold-muted);
+  --color-accent-foreground: var(--color-text);
+  --color-destructive: var(--color-error);
+  --color-destructive-foreground: #fff;
+  --color-input: var(--color-border-strong);
+  --color-ring: var(--color-gold);
+
+  /* Fonts */
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.18);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* Animations */
+  --animate-fade-in: fade-in 200ms ease-out forwards;
+  --animate-slide-up: slide-up 240ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  --animate-shimmer: shimmer 2s linear infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ===== Base ===== */
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: #000;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-gold-muted); }
+
+/* ===== Atmospheric utilities ===== */
+
+.bg-noise {
+  position: relative;
+}
+.bg-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.bg-gold-glow {
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.18) 0%, transparent 60%);
+}
+
+.bg-grid-faint {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #F5CD5B 0%, #D4AF37 50%, #9A7D26 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shimmer-gold {
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.18) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+}
+
+.font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+.font-sans    { font-family: var(--font-sans); }
+
+/* Premium hairline divider */
+.hairline-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--color-gold) 50%, transparent 100%);
+}
+
+/* Card hover (gold border + lift) */
+.card-luxury {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+}
+.card-luxury:hover {
+  border-color: var(--color-gold-muted);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
