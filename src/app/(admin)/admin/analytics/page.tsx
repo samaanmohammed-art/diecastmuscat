@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
 import { AnalyticsCharts } from "@/components/admin/AnalyticsCharts";
 import {
-  MOCK_REVENUE_DATA,
-  getCategoryBreakdown,
-  getCustomerGrowth,
-  getTopProducts,
-} from "@/lib/mock-admin";
+  fetchRevenueSeries,
+  fetchTopProducts,
+  fetchCategoryBreakdown,
+  fetchCustomerGrowth,
+} from "@/lib/admin-db";
 
 export const metadata: Metadata = {
   title: "Analytics",
 };
 
 export default async function AdminAnalyticsPage() {
-  const topProducts = getTopProducts(6);
-  const categories = getCategoryBreakdown();
-  const customerGrowth = getCustomerGrowth();
+  const [revenue, topProducts, categories, customerGrowth] = await Promise.all([
+    fetchRevenueSeries(90),
+    fetchTopProducts(6),
+    fetchCategoryBreakdown(),
+    fetchCustomerGrowth(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -29,7 +32,7 @@ export default async function AdminAnalyticsPage() {
       </header>
 
       <AnalyticsCharts
-        revenue={MOCK_REVENUE_DATA}
+        revenue={revenue}
         topProducts={topProducts}
         categories={categories}
         customerGrowth={customerGrowth}

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyOMR, formatDate } from "@/lib/utils";
 import { OrderDetailDrawer } from "@/components/admin/OrderDetailDrawer";
-import type { MockOrder } from "@/lib/mock-admin";
+import type { AdminOrder as MockOrder } from "@/lib/admin-db";
 import type { OrderStatus, PaymentStatus } from "@/types/database";
 
 interface OrdersTableProps {

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { ProductTable } from "@/components/admin/ProductTable";
-import { SAMPLE_PRODUCTS } from "@/lib/sample-products";
+import { fetchProducts } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Products",
 };
 
 export default async function AdminProductsPage() {
-  const products = SAMPLE_PRODUCTS;
+  const { products, total } = await fetchProducts({ limit: 60, page: 1 });
 
   return (
     <div className="space-y-8">
@@ -17,7 +17,7 @@ export default async function AdminProductsPage() {
           Products
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Manage the full catalogue. {products.length} items currently published.
+          Manage the full catalogue. {total} items currently published.
         </p>
       </header>
       <ProductTable products={products} />

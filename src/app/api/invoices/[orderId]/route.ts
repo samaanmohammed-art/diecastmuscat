@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { generateInvoicePDF } from "@/lib/invoice";
-import { MOCK_ORDERS, MOCK_CUSTOMERS } from "@/lib/mock-admin";
 import { createClient } from "@/lib/supabase/server";
+import { fetchAdminOrderById } from "@/lib/admin-db";
 import type { Customer, Order, OrderItem } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -12,16 +12,19 @@ interface ResolvedOrder {
   customer: Customer;
 }
 
-function resolveFromMocks(orderId: string): ResolvedOrder | null {
-  const found = MOCK_ORDERS.find(
-    (o) => o.id === orderId || o.invoice_number === orderId
-  );
+async function resolveOrder(orderId: string): Promise<ResolvedOrder | null> {
+  const found = await fetchAdminOrderById(orderId);
   if (!found) return null;
-  const customer =
-    MOCK_CUSTOMERS.find((c) => c.id === found.customer_id) ?? null;
+
+  const supabase = await createClient();
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("*")
+    .eq("id", found.customer_id)
+    .maybeSingle();
   if (!customer) return null;
 
-  // Strip mock-only props for the PDF generator's typed contract.
+  // Strip the AdminOrder enrichments (customer_name, items, image) for the PDF contract
   const order: Order = {
     id: found.id,
     customer_id: found.customer_id,
@@ -52,20 +55,7 @@ function resolveFromMocks(orderId: string): ResolvedOrder | null {
     subtotal: it.subtotal,
     created_at: it.created_at,
   }));
-  const cust: Customer = {
-    id: customer.id,
-    user_id: customer.user_id,
-    email: customer.email,
-    name: customer.name,
-    phone: customer.phone,
-    address: customer.address,
-    city: customer.city,
-    country: customer.country,
-    postal_code: customer.postal_code,
-    created_at: customer.created_at,
-    updated_at: customer.updated_at,
-  };
-  return { order, items, customer: cust };
+  return { order, items, customer: customer as Customer };
 }
 
 async function getRequesterIdentity(): Promise<{
@@ -108,19 +98,19 @@ export async function GET(
     return NextResponse.json({ error: "orderId is required" }, { status: 400 });
   }
 
-  const resolved = resolveFromMocks(orderId);
+  const resolved = await resolveOrder(orderId);
   if (!resolved) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
-  // Authorization: any authenticated session that matches the order's
-  // customer email, or an admin user, may download. In current mock-only
-  // dev mode there is no Supabase project, so we permit when there is no
-  // auth context (createClient throws or returns no user).
+  // Authorization: customer who owns the order, or an admin
   const identity = await getRequesterIdentity();
-  if (identity.userId && !identity.isAdmin) {
+  if (!identity.userId) {
+    return NextResponse.json({ error: "Sign in to download invoices" }, { status: 401 });
+  }
+  if (!identity.isAdmin) {
     if (
-      identity.email &&
+      !identity.email ||
       identity.email.toLowerCase() !== resolved.customer.email.toLowerCase()
     ) {
       return NextResponse.json(

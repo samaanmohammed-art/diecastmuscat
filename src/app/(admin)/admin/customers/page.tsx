@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Mail, Phone } from "lucide-react";
 import { formatCurrencyOMR, formatDate } from "@/lib/utils";
-import { MOCK_CUSTOMERS } from "@/lib/mock-admin";
+import { fetchAdminCustomers } from "@/lib/admin-db";
 
 export const metadata: Metadata = {
   title: "Customers",
 };
 
 export default async function AdminCustomersPage() {
-  const customers = [...MOCK_CUSTOMERS].sort(
-    (a, b) => b.total_spent - a.total_spent
-  );
+  const all = await fetchAdminCustomers();
+  const customers = [...all].sort((a, b) => b.total_spent - a.total_spent);
 
   return (
     <div className="space-y-8">

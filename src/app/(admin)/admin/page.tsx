@@ -6,10 +6,10 @@ import { SalesChart } from "@/components/admin/SalesChart";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyOMR, formatDate } from "@/lib/utils";
 import {
-  MOCK_ORDERS,
-  MOCK_REVENUE_DATA,
-  getDashboardStats,
-} from "@/lib/mock-admin";
+  fetchAdminOrders,
+  fetchAdminDashboardStats,
+  fetchRevenueSeries,
+} from "@/lib/admin-db";
 import type { OrderStatus } from "@/types/database";
 
 export const metadata: Metadata = {
@@ -28,10 +28,12 @@ const STATUS_VARIANT: Record<
 };
 
 export default async function AdminDashboardPage() {
-  const stats = getDashboardStats();
-  const recentOrders = [...MOCK_ORDERS]
-    .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
-    .slice(0, 6);
+  const [stats, allOrders, revenueSeries] = await Promise.all([
+    fetchAdminDashboardStats(),
+    fetchAdminOrders(),
+    fetchRevenueSeries(90),
+  ]);
+  const recentOrders = allOrders.slice(0, 6);
 
   return (
     <div className="space-y-8">
@@ -86,7 +88,7 @@ export default async function AdminDashboardPage() {
             <Badge variant="gold">OMR</Badge>
           </div>
           <div className="mt-6">
-            <SalesChart data={MOCK_REVENUE_DATA} />
+            <SalesChart data={revenueSeries} />
           </div>
         </div>
 

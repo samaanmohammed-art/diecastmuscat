@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrencyOMR, formatDate } from "@/lib/utils";
-import type { MockOrder } from "@/lib/mock-admin";
+import type { AdminOrder as MockOrder } from "@/lib/admin-db";
 import type { OrderStatus } from "@/types/database";
 
 interface OrderDetailDrawerProps {
