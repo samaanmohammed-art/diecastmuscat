@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowLeft, ArrowUpRight, Command, Compass } from "lucide-react";
 import { fetchFeaturedProducts, fetchLimitedProducts } from "@/lib/db";
+import { MOCK_PRODUCTS } from "@/lib/preview-mock";
 
 export const metadata: Metadata = {
   title: "II — Concourse Noir · Diecast Muscat",
@@ -17,10 +18,12 @@ const HIDE_CHROME_CSS = `
 `;
 
 export default async function ShowroomPreview() {
-  const [featured, limited] = await Promise.all([
+  const [featuredLive, limitedLive] = await Promise.all([
     fetchFeaturedProducts(8),
     fetchLimitedProducts(2),
   ]);
+  const featured = featuredLive.length ? featuredLive : MOCK_PRODUCTS.featured;
+  const limited = limitedLive.length ? limitedLive : MOCK_PRODUCTS.limited;
   const hero = limited[0] ?? featured[0];
   const second = limited[1] ?? featured[1];
 
