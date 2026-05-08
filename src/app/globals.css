@@ -146,6 +146,36 @@ body {
 .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 .font-sans    { font-family: var(--font-sans); }
 
+/* Mobile bottom-nav clearance — content stops above the bottom nav + safe-area inset */
+.pb-safe-nav {
+  padding-bottom: 0;
+}
+@media (max-width: 1023px) {
+  .pb-safe-nav {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Horizontal-scroll shelf — used by FeaturedStrip + redesigned shelves */
+.shelf-scroll {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.shelf-scroll::-webkit-scrollbar { display: none; }
+
+/* Skeleton shimmer block */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-elevated) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: var(--radius-md);
+}
+
 /* Premium hairline divider */
 .hairline-gold {
   height: 1px;
