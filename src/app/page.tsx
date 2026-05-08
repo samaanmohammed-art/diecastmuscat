@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/home/Hero";
-import { Categories } from "@/components/home/Categories";
-import { FeaturedStrip } from "@/components/home/FeaturedStrip";
-import { LimitedSpotlight } from "@/components/home/LimitedSpotlight";
-import { AIRecommendations } from "@/components/home/AIRecommendations";
-import { BrandStory } from "@/components/home/BrandStory";
+import { MobileHero } from "@/components/home/MobileHero";
+import { CategoryPills } from "@/components/home/CategoryPills";
+import { CategoryShelf } from "@/components/home/CategoryShelf";
+import { BrandStrip } from "@/components/home/BrandStrip";
+import { RecentlyViewedShelf } from "@/components/home/RecentlyViewedShelf";
+import { ReassuranceStrip } from "@/components/home/ReassuranceStrip";
 import { Newsletter } from "@/components/home/Newsletter";
 import {
   fetchFeaturedProducts,
@@ -21,25 +21,65 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [featured, limited, topRated] = await Promise.all([
     fetchFeaturedProducts(8),
-    fetchLimitedProducts(1),
+    fetchLimitedProducts(8),
     fetchTopRatedProducts(8),
   ]);
-  const limitedSpotlight = limited[0];
 
-  // AI recommendations strip — sample 4 from top-rated pool for variety
-  const recommended = [topRated[1], topRated[3], topRated[5], topRated[7]].filter(
-    (p): p is (typeof topRated)[number] => Boolean(p)
-  );
+  const heroFeature = limited[0] ?? featured[0];
 
   return (
-    <main className="relative">
-      <Hero />
-      <Categories />
-      <FeaturedStrip products={featured} />
-      {limitedSpotlight && <LimitedSpotlight product={limitedSpotlight} />}
-      <AIRecommendations products={recommended} />
-      <BrandStory />
+    <>
+      <MobileHero feature={heroFeature} />
+
+      <CategoryPills />
+
+      {limited.length > 0 && (
+        <CategoryShelf
+          eyebrow="Numbered editions"
+          title={
+            <>
+              Allocated <em className="not-italic text-gold font-display italic">only</em>
+            </>
+          }
+          href="/products?limited=1"
+          products={limited}
+        />
+      )}
+
+      {featured.length > 0 && (
+        <CategoryShelf
+          eyebrow="Curator's selection"
+          title={
+            <>
+              Newly arrived <em className="not-italic text-gold font-display italic">on the shelf</em>
+            </>
+          }
+          href="/products"
+          products={featured}
+        />
+      )}
+
+      <BrandStrip />
+
+      {topRated.length > 0 && (
+        <CategoryShelf
+          eyebrow="Top rated"
+          title={
+            <>
+              What collectors <em className="not-italic text-gold font-display italic">return for</em>
+            </>
+          }
+          href="/products?sort=popular"
+          products={topRated}
+          variant="compact"
+        />
+      )}
+
+      <RecentlyViewedShelf />
+
+      <ReassuranceStrip />
+
       <Newsletter />
-    </main>
+    </>
   );
 }
