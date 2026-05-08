@@ -105,19 +105,17 @@ export function ProductCard({ product, className, priority, compact }: ProductCa
           <button
             type="button"
             className={cn(
-              "absolute bottom-[calc(100%-1px)] sm:bottom-auto sm:top-2.5",
-              "left-2.5 sm:left-auto sm:right-12",
-              "inline-flex items-center gap-1.5 h-8 px-3 rounded-full",
-              "border border-border-strong bg-bg/70 backdrop-blur",
+              "absolute top-2.5 right-12",
+              "inline-flex items-center justify-center h-8 w-8 sm:w-auto sm:px-3 sm:gap-1.5 rounded-full",
+              "border border-border-strong/60 bg-bg/70 backdrop-blur",
               "text-[10px] uppercase tracking-[0.22em] text-text-muted",
               "hover:border-gold/60 hover:text-gold transition-colors",
-              "translate-y-[-50%] sm:translate-y-0",
-              "opacity-0 group-hover:opacity-100 sm:transition-opacity sm:duration-200"
+              "sm:opacity-0 sm:group-hover:opacity-100 sm:transition-opacity sm:duration-200"
             )}
             aria-label={`Quick view: ${product.name}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <Eye className="h-3 w-3" />
+            <Eye className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Quick</span>
           </button>
         </QuickView>
