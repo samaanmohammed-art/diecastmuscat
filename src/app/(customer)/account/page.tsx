@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowRight, Heart, MapPin, Package } from "lucide-react";
+import { ArrowRight, MapPin, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrencyOMR, formatDate } from "@/lib/utils";
 import { ProfileForm } from "./ProfileForm";
+import { WishlistCard } from "@/components/account/WishlistCard";
 import type { Customer, Order, OrderStatus } from "@/types/database";
 
 export const metadata: Metadata = {
@@ -61,21 +62,21 @@ export default async function AccountPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-6 py-12 lg:py-16">
-      <header className="mb-10 lg:mb-14 flex flex-col gap-3">
-        <span className="text-[11px] uppercase tracking-[0.3em] text-gold">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-12 lg:py-16">
+      <header className="mb-6 sm:mb-10 lg:mb-14 flex flex-col gap-2 sm:gap-3">
+        <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.32em] text-gold">
           Your account
         </span>
-        <h1 className="font-display text-4xl lg:text-5xl text-text">
+        <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-text leading-tight">
           Welcome back{profile.name ? `, ${profile.name.split(" ")[0]}` : ""}
         </h1>
-        <p className="text-text-muted">
+        <p className="text-xs sm:text-base text-text-muted">
           Curate your collection, track dispatches, and manage your details.
         </p>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <section className="lg:col-span-2 flex flex-col gap-8">
+      <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3">
+        <section className="lg:col-span-2 flex flex-col gap-4 sm:gap-6 lg:gap-8">
           <Card title="Profile" description="Keep your details current.">
             <ProfileForm initialValues={profile} />
           </Card>
@@ -141,22 +142,8 @@ export default async function AccountPage() {
           </Card>
         </section>
 
-        <aside className="flex flex-col gap-8">
-          <Card
-            title="Wishlist"
-            description="Pieces you've saved for later."
-          >
-            <EmptyState
-              icon={<Heart className="h-6 w-6 text-text-dim" />}
-              title="No saved pieces"
-              description="Save pieces from the collection to revisit them here."
-              cta={
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/products">Explore</Link>
-                </Button>
-              }
-            />
-          </Card>
+        <aside className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
+          <WishlistCard />
 
           <Card title="Address" description="Default delivery destination.">
             {address.address ? (

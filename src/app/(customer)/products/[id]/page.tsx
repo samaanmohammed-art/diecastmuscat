@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Shield, Sparkles, Truck, RotateCcw } from "lucide-react";
 import { fetchProductById, fetchRelatedProducts } from "@/lib/db";
-import type { Product } from "@/types/database";
 import { formatCurrencyOMR } from "@/lib/utils";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { AddToCartButton } from "@/components/products/AddToCartButton";

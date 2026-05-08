@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { X, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -64,11 +64,11 @@ export function AIChat() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — desktop only; mobile reaches it via search sheet / BottomNav */}
       <button
         onClick={() => setOpen(true)}
         className={cn(
-          "fixed bottom-6 right-6 z-40 h-14 px-5 inline-flex items-center gap-2 rounded-full",
+          "hidden lg:inline-flex fixed bottom-6 right-6 z-40 h-14 px-5 items-center gap-2 rounded-full",
           "bg-gold text-black shadow-glow hover:shadow-[0_0_36px_rgba(212,175,55,0.4)]",
           "transition-all duration-200",
           open && "opacity-0 pointer-events-none scale-90"
@@ -86,7 +86,10 @@ export function AIChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-            className="fixed bottom-6 right-6 z-50 w-[calc(100vw-3rem)] sm:w-[400px] h-[560px] max-h-[80vh] rounded-lg overflow-hidden flex flex-col bg-surface border border-border-strong shadow-card"
+            className="fixed inset-x-3 bottom-3 sm:bottom-6 sm:right-6 sm:left-auto z-50 sm:w-[400px] h-[calc(100dvh-2rem)] sm:h-[560px] max-h-[80vh] rounded-lg overflow-hidden flex flex-col bg-surface border border-border-strong shadow-card"
+            style={{
+              bottom: "calc(env(safe-area-inset-bottom) + 4.5rem)",
+            }}
           >
             <header className="flex items-center justify-between px-5 py-4 border-b border-border bg-gradient-to-b from-surface-elevated to-surface">
               <div className="flex items-center gap-3">

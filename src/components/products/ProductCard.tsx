@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Eye } from "lucide-react";
 import type { Product } from "@/types/database";
 import { formatCurrencyOMR, cn } from "@/lib/utils";
-import { useCartStore } from "@/stores/cart";
 import { Badge } from "@/components/ui/badge";
 import { WishlistButton } from "./WishlistButton";
+import { QuickView } from "./QuickView";
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +18,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className, priority, compact }: ProductCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
   const image = product.images?.[0] ?? null;
   const outOfStock = product.stock <= 0;
 
@@ -101,20 +100,28 @@ export function ProductCard({ product, className, priority, compact }: ProductCa
         <WishlistButton productId={product.id} size="sm" />
       </div>
 
-      <button
-        onClick={() => !outOfStock && addItem(product, 1)}
-        disabled={outOfStock}
-        className={cn(
-          "absolute bottom-4 right-4 h-11 w-11 rounded-full items-center justify-center",
-          "bg-gold text-black hidden sm:inline-flex",
-          "opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
-          "transition-all duration-200 shadow-glow",
-          "disabled:bg-surface-elevated disabled:text-text-dim disabled:opacity-30 disabled:translate-y-0"
-        )}
-        aria-label="Add to cart"
-      >
-        <Plus className="h-4 w-4" strokeWidth={2.4} />
-      </button>
+      {!outOfStock && (
+        <QuickView product={product}>
+          <button
+            type="button"
+            className={cn(
+              "absolute bottom-[calc(100%-1px)] sm:bottom-auto sm:top-2.5",
+              "left-2.5 sm:left-auto sm:right-12",
+              "inline-flex items-center gap-1.5 h-8 px-3 rounded-full",
+              "border border-border-strong bg-bg/70 backdrop-blur",
+              "text-[10px] uppercase tracking-[0.22em] text-text-muted",
+              "hover:border-gold/60 hover:text-gold transition-colors",
+              "translate-y-[-50%] sm:translate-y-0",
+              "opacity-0 group-hover:opacity-100 sm:transition-opacity sm:duration-200"
+            )}
+            aria-label={`Quick view: ${product.name}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Eye className="h-3 w-3" />
+            <span className="hidden sm:inline">Quick</span>
+          </button>
+        </QuickView>
+      )}
     </motion.div>
   );
 }
