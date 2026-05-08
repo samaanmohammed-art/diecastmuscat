@@ -20,7 +20,8 @@ export function StickyCartBar() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/preview") ||
     pathname.startsWith("/checkout") ||
-    pathname.startsWith("/cart")
+    pathname.startsWith("/cart") ||
+    pathname.startsWith("/products/")
   ) {
     return null;
   }
