@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Search, ShoppingBag, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCartStore, cartSelectors } from "@/stores/cart";
 import { useWishlistStore, wishlistSelectors } from "@/stores/wishlist";
 import { cn } from "@/lib/utils";
+import { useMounted } from "@/hooks/useMounted";
 import { MobileSearchSheet } from "./MobileSearchSheet";
 
 const TABS = [
@@ -23,8 +24,7 @@ export function BottomNav() {
   const wishCount = useWishlistStore(wishlistSelectors.count);
   const openCart = useCartStore((s) => s.openCart);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";

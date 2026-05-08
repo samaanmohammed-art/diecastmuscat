@@ -1,19 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore, cartSelectors } from "@/stores/cart";
 import { formatCurrencyOMR } from "@/lib/utils";
+import { useMounted } from "@/hooks/useMounted";
 
 export function StickyCartBar() {
   const pathname = usePathname();
   const count = useCartStore(cartSelectors.count);
   const subtotal = useCartStore(cartSelectors.subtotal);
   const openCart = useCartStore((s) => s.openCart);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   if (!mounted || count === 0) return null;
   if (

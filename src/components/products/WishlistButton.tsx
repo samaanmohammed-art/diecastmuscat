@@ -1,9 +1,9 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useWishlistStore } from "@/stores/wishlist";
 import { cn } from "@/lib/utils";
+import { useMounted } from "@/hooks/useMounted";
 
 interface WishlistButtonProps {
   productId: string;
@@ -20,8 +20,7 @@ export function WishlistButton({
 }: WishlistButtonProps) {
   const toggle = useWishlistStore((s) => s.toggle);
   const ids = useWishlistStore((s) => s.ids);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const active = mounted && ids.includes(productId);
 

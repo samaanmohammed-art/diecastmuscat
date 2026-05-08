@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRecentlyViewedStore } from "@/stores/recentlyViewed";
 import { ProductCard } from "@/components/products/ProductCard";
+import { useMounted } from "@/hooks/useMounted";
 
 export function RecentlyViewedShelf() {
   const items = useRecentlyViewedStore((s) => s.items);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   if (!mounted || items.length === 0) return null;
 
