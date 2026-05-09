@@ -237,6 +237,18 @@ export default async function OrderDetailPage({
                 Download invoice
               </a>
             </Button>
+            {order.status !== "cancelled" && order.payment_status === "paid" && (
+              <Button asChild variant="outline" className="border-gold/30 text-gold hover:bg-gold/5">
+                <a
+                  href={`/api/certificates/${order.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Download className="h-4 w-4" />
+                  Certificate of Authenticity
+                </a>
+              </Button>
+            )}
             <Button asChild variant="ghost">
               <Link href="/contact">
                 <HelpCircle className="h-4 w-4" />
