@@ -1,33 +1,36 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
-import { fetchProducts, type SortKey } from "@/lib/db";
-import { ProductCard } from "@/components/products/ProductCard";
+import { X } from "lucide-react";
 import { ProductFilters } from "@/components/products/ProductFilters";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ProductsGrid, type ProductsGridParams } from "./ProductsGrid";
+import { ProductsGridSkeleton } from "./ProductsGridSkeleton";
 
-const PAGE_SIZE = 12;
-
-interface SearchParams {
-  category?: string;
-  scale?: string;
-  brand?: string;
-  q?: string;
-  sort?: string;
-  limited?: string;
-  minPrice?: string;
-  maxPrice?: string;
-  page?: string;
-}
+type SearchParams = ProductsGridParams;
 
 const CATEGORY_TITLES: Record<string, string> = {
   cars: "Cars",
-  planes: "Planes",
-  trucks: "Trucks",
-  bikes: "Bikes",
+  planes: "Aviation",
+  trucks: "Heavy haul",
+  bikes: "Motorcycles",
 };
+
+const QUICK_PILLS: {
+  label: string;
+  params: Record<string, string | undefined>;
+  accent?: boolean;
+}[] = [
+  { label: "All", params: {} },
+  { label: "Cars", params: { category: "cars" } },
+  { label: "Aviation", params: { category: "planes" } },
+  { label: "Trucks", params: { category: "trucks" } },
+  { label: "Bikes", params: { category: "bikes" } },
+  { label: "Limited", params: { limited: "1" }, accent: true },
+  { label: "1:18", params: { scale: "1:18" } },
+  { label: "1:43", params: { scale: "1:43" } },
+  { label: "1:64", params: { scale: "1:64" } },
+];
 
 export async function generateMetadata({
   searchParams,
@@ -51,91 +54,98 @@ export default async function ProductsPage({
 }) {
   const sp = await searchParams;
 
-  const pageNum = Math.max(1, Number(sp.page ?? 1) || 1);
-  const sortValue = (sp.sort as SortKey) ?? "newest";
-
-  const { products: pageItems, total } = await fetchProducts({
-    category: sp.category,
-    scale: sp.scale,
-    brand: sp.brand,
-    q: sp.q,
-    limited: sp.limited,
-    minPrice: sp.minPrice ? Number(sp.minPrice) : null,
-    maxPrice: sp.maxPrice ? Number(sp.maxPrice) : null,
-    sort: sortValue,
-    page: pageNum,
-    limit: PAGE_SIZE,
-  });
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage = Math.min(pageNum, totalPages);
-  const start = (safePage - 1) * PAGE_SIZE;
-
   const categoryTitle = sp.category && CATEGORY_TITLES[sp.category];
-  const heading = categoryTitle ?? "The Collection";
+  const heading = sp.q
+    ? `Results for "${sp.q}"`
+    : sp.limited === "1"
+    ? "Numbered editions"
+    : categoryTitle ?? "The Collection";
+
+  const activeChips = buildActiveChips(sp);
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Header */}
-      <header className="border-b border-border bg-surface/40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
-            Curated Diecast
+      <header className="border-b border-border bg-surface/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14">
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.32em] text-gold mb-2 sm:mb-3">
+            Curated diecast
           </p>
-          <h1 className="font-display text-4xl lg:text-5xl text-text">{heading}</h1>
-          <p className="mt-3 text-text-muted text-sm">
-            {total === 0
-              ? "No pieces match your refinement."
-              : `${total} ${total === 1 ? "piece" : "pieces"} in the vault${
-                  sp.q ? ` for "${sp.q}"` : ""
-                }`}
-          </p>
+          <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl text-text leading-tight">
+            {heading}
+          </h1>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <div
+        className="sticky z-20 bg-bg/90 backdrop-blur-md border-b border-border"
+        style={{ top: "calc(4rem + env(safe-area-inset-top))" }}
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="shelf-scroll overflow-x-auto">
+            <ul className="flex gap-2 px-4 sm:px-6 lg:px-8 py-3">
+              {QUICK_PILLS.map((pill) => {
+                const href = buildHref({}, pill.params);
+                const matches = pillMatches(sp, pill.params);
+                return (
+                  <li key={pill.label} className="shrink-0">
+                    <Link
+                      href={href}
+                      className={cn(
+                        "inline-flex items-center h-9 px-4 rounded-full border text-xs uppercase tracking-[0.18em] whitespace-nowrap transition-colors",
+                        matches
+                          ? "bg-gold text-bg border-gold"
+                          : pill.accent
+                          ? "bg-gold/10 border-gold/40 text-gold hover:bg-gold/15"
+                          : "bg-surface border-border-strong text-text-muted hover:border-gold/40 hover:text-text"
+                      )}
+                    >
+                      {pill.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+        {activeChips.length > 0 && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-text-dim">
+              Filters
+            </span>
+            {activeChips.map((chip) => (
+              <Link
+                key={chip.key}
+                href={chip.removeHref}
+                className="inline-flex items-center gap-1.5 h-7 px-3 rounded-full bg-gold/10 border border-gold/40 text-gold text-[11px]"
+              >
+                {chip.label}
+                <X className="h-3 w-3" />
+              </Link>
+            ))}
+            <Link
+              href="/products"
+              className="text-[10px] uppercase tracking-[0.22em] text-text-muted hover:text-gold underline-offset-4 hover:underline"
+            >
+              Clear all
+            </Link>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row lg:gap-10">
           <Suspense fallback={<aside className="lg:w-72 shrink-0" />}>
             <ProductFilters />
           </Suspense>
 
           <main className="flex-1 min-w-0">
-            {/* Sort bar */}
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <p className="text-xs text-text-muted">
-                {total > 0 && (
-                  <>
-                    Showing{" "}
-                    <span className="text-text">
-                      {start + 1}–{Math.min(start + PAGE_SIZE, total)}
-                    </span>{" "}
-                    of <span className="text-text">{total}</span>
-                  </>
-                )}
-              </p>
-              <SortLinks current={sortValue} sp={sp} />
-            </div>
-
-            {/* Empty state */}
-            {pageItems.length === 0 ? (
-              <EmptyState />
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-                  {pageItems.map((p, idx) => (
-                    <ProductCard key={p.id} product={p} priority={idx < 3} />
-                  ))}
-                </div>
-
-                {totalPages > 1 && (
-                  <Pagination
-                    page={safePage}
-                    totalPages={totalPages}
-                    sp={sp}
-                  />
-                )}
-              </>
-            )}
+            <Suspense
+              key={JSON.stringify(sp)}
+              fallback={<ProductsGridSkeleton />}
+            >
+              <ProductsGrid sp={sp} />
+            </Suspense>
           </main>
         </div>
       </div>
@@ -143,138 +153,95 @@ export default async function ProductsPage({
   );
 }
 
-function buildHref(sp: SearchParams, overrides: Record<string, string | undefined>): string {
+function pillMatches(sp: SearchParams, pillParams: Record<string, string | undefined>): boolean {
+  const keys = Object.keys(pillParams);
+  if (keys.length === 0) {
+    return !sp.category && !sp.scale && !sp.limited && !sp.brand && !sp.q;
+  }
+  return keys.every((k) => sp[k as keyof SearchParams] === pillParams[k]);
+}
+
+function buildActiveChips(sp: SearchParams): {
+  key: string;
+  label: string;
+  removeHref: string;
+}[] {
+  const chips: { key: string; label: string; removeHref: string }[] = [];
+  if (sp.q) {
+    chips.push({
+      key: "q",
+      label: `"${sp.q}"`,
+      removeHref: buildHref(sp, { q: undefined, page: undefined }),
+    });
+  }
+  if (sp.category) {
+    chips.push({
+      key: "category",
+      label: CATEGORY_TITLES[sp.category] ?? sp.category,
+      removeHref: buildHref(sp, { category: undefined, page: undefined }),
+    });
+  }
+  if (sp.scale) {
+    sp.scale.split(",").forEach((s) => {
+      chips.push({
+        key: `scale-${s}`,
+        label: s,
+        removeHref: removeFromMulti(sp, "scale", s),
+      });
+    });
+  }
+  if (sp.brand) {
+    sp.brand.split(",").forEach((b) => {
+      chips.push({
+        key: `brand-${b}`,
+        label: b,
+        removeHref: removeFromMulti(sp, "brand", b),
+      });
+    });
+  }
+  if (sp.limited === "1") {
+    chips.push({
+      key: "limited",
+      label: "Limited",
+      removeHref: buildHref(sp, { limited: undefined, page: undefined }),
+    });
+  }
+  if (sp.minPrice || sp.maxPrice) {
+    chips.push({
+      key: "price",
+      label: `OMR ${sp.minPrice ?? 0}–${sp.maxPrice ?? "∞"}`,
+      removeHref: buildHref(sp, {
+        minPrice: undefined,
+        maxPrice: undefined,
+        page: undefined,
+      }),
+    });
+  }
+  return chips;
+}
+
+function removeFromMulti(sp: SearchParams, key: "scale" | "brand", value: string): string {
+  const remaining = (sp[key] ?? "")
+    .split(",")
+    .filter(Boolean)
+    .filter((x) => x !== value);
+  return buildHref(sp, {
+    [key]: remaining.length > 0 ? remaining.join(",") : undefined,
+    page: undefined,
+  });
+}
+
+function buildHref(
+  sp: SearchParams,
+  overrides: Record<string, string | undefined>
+): string {
   const next = new URLSearchParams();
-  const merged = { ...sp, ...overrides };
+  const merged: Record<string, string | undefined> = { ...sp, ...overrides };
   for (const [k, v] of Object.entries(merged)) {
     if (v !== undefined && v !== null && v !== "") {
-      next.set(k, String(v));
+      next.set(k, v as string);
     }
   }
   const qs = next.toString();
   return qs ? `/products?${qs}` : "/products";
-}
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: "newest", label: "Newest" },
-  { value: "popular", label: "Popular" },
-  { value: "price-asc", label: "Price ↑" },
-  { value: "price-desc", label: "Price ↓" },
-];
-
-function SortLinks({ current, sp }: { current: SortKey; sp: SearchParams }) {
-  return (
-    <div className="hidden sm:flex items-center gap-1 text-xs">
-      <span className="text-text-dim mr-2 uppercase tracking-[0.18em]">Sort</span>
-      {SORT_OPTIONS.map((opt) => {
-        const active = current === opt.value;
-        return (
-          <Link
-            key={opt.value}
-            href={buildHref(sp, { sort: opt.value, page: undefined })}
-            scroll={false}
-            className={cn(
-              "rounded-md px-2.5 py-1 transition-colors",
-              active
-                ? "text-gold bg-gold/10"
-                : "text-text-muted hover:text-text hover:bg-surface-elevated"
-            )}
-          >
-            {opt.label}
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
-
-function Pagination({
-  page,
-  totalPages,
-  sp,
-}: {
-  page: number;
-  totalPages: number;
-  sp: SearchParams;
-}) {
-  const prevHref = buildHref(sp, { page: page > 1 ? String(page - 1) : undefined });
-  const nextHref = buildHref(sp, {
-    page: page < totalPages ? String(page + 1) : undefined,
-  });
-
-  return (
-    <nav className="mt-12 flex items-center justify-center gap-2">
-      <Link
-        href={prevHref}
-        scroll={false}
-        aria-disabled={page <= 1}
-        className={cn(
-          "inline-flex items-center gap-1 rounded-md border border-border-strong px-3 h-10 text-sm transition-colors",
-          page <= 1
-            ? "pointer-events-none opacity-40"
-            : "text-text hover:border-gold hover:text-gold"
-        )}
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Previous
-      </Link>
-
-      <div className="flex items-center gap-1 mx-2">
-        {Array.from({ length: totalPages }).map((_, i) => {
-          const n = i + 1;
-          const active = n === page;
-          return (
-            <Link
-              key={n}
-              href={buildHref(sp, { page: n === 1 ? undefined : String(n) })}
-              scroll={false}
-              className={cn(
-                "inline-flex h-10 min-w-10 items-center justify-center rounded-md text-sm font-mono transition-colors",
-                active
-                  ? "bg-gold text-black"
-                  : "text-text-muted hover:text-text hover:bg-surface-elevated"
-              )}
-            >
-              {n}
-            </Link>
-          );
-        })}
-      </div>
-
-      <Link
-        href={nextHref}
-        scroll={false}
-        aria-disabled={page >= totalPages}
-        className={cn(
-          "inline-flex items-center gap-1 rounded-md border border-border-strong px-3 h-10 text-sm transition-colors",
-          page >= totalPages
-            ? "pointer-events-none opacity-40"
-            : "text-text hover:border-gold hover:text-gold"
-        )}
-      >
-        Next
-        <ChevronRight className="h-4 w-4" />
-      </Link>
-    </nav>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center text-center py-24 px-6 rounded-lg border border-dashed border-border bg-surface/40">
-      <div className="h-14 w-14 rounded-full bg-surface-elevated border border-border-strong flex items-center justify-center mb-5">
-        <SearchX className="h-6 w-6 text-text-dim" />
-      </div>
-      <h3 className="font-display text-2xl text-text">No matching pieces</h3>
-      <p className="mt-2 max-w-md text-sm text-text-muted">
-        We couldn&apos;t find anything in the vault that matches your refinement.
-        Try widening your search or removing a filter.
-      </p>
-      <Link href="/products" className="mt-6">
-        <Button variant="outline" size="default">
-          Reset filters
-        </Button>
-      </Link>
-    </div>
-  );
 }

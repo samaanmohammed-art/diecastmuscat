@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "@/components/layout/Providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { BottomNav } from "@/components/layout/BottomNav";
+import { StickyCartBar } from "@/components/layout/StickyCartBar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { AIChat } from "@/components/shared/AIChat";
 
@@ -36,17 +38,26 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: "#0A0A0A",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} dark`}>
-      <body className="min-h-screen bg-bg text-text antialiased font-sans">
+      <body className="min-h-screen bg-bg text-text antialiased font-sans pb-safe-nav">
         <Providers>
           <Navbar />
           <main className="min-h-[calc(100vh-200px)]">{children}</main>
           <Footer />
           <CartDrawer />
+          <StickyCartBar />
+          <BottomNav />
           <AIChat />
         </Providers>
       </body>

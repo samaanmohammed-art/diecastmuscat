@@ -3,20 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingBag } from "lucide-react";
+import { Eye } from "lucide-react";
 import type { Product } from "@/types/database";
 import { formatCurrencyOMR, cn } from "@/lib/utils";
-import { useCartStore } from "@/stores/cart";
 import { Badge } from "@/components/ui/badge";
+import { WishlistButton } from "./WishlistButton";
+import { QuickView } from "./QuickView";
 
 interface ProductCardProps {
   product: Product;
   className?: string;
   priority?: boolean;
+  compact?: boolean;
 }
 
-export function ProductCard({ product, className, priority }: ProductCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
+export function ProductCard({ product, className, priority, compact }: ProductCardProps) {
   const image = product.images?.[0] ?? null;
   const outOfStock = product.stock <= 0;
 
@@ -32,7 +33,7 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
       )}
     >
       <Link href={`/products/${product.id}`} className="block">
-        <div className="relative aspect-[4/3] bg-bg overflow-hidden">
+        <div className={cn("relative bg-bg overflow-hidden", compact ? "aspect-square" : "aspect-[4/3]")}>
           {image ? (
             <Image
               src={image}
@@ -46,7 +47,8 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
             <PlaceholderArt category={product.category} />
           )}
 
-          {/* Badges layer */}
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-bg/85 via-bg/30 to-transparent pointer-events-none" />
+
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {product.is_limited_edition && (
               <Badge variant="gold" className="text-[10px] uppercase tracking-[0.18em]">
@@ -60,59 +62,86 @@ export function ProductCard({ product, className, priority }: ProductCardProps) 
             )}
           </div>
 
-          {/* Scale chip */}
           {product.scale && (
-            <div className="absolute top-3 right-3 px-2 py-1 rounded-sm text-[10px] font-mono bg-black/60 backdrop-blur-sm text-text border border-border-strong">
+            <div className="absolute bottom-3 left-3 px-2 py-1 rounded-sm text-[10px] font-mono bg-black/60 backdrop-blur-sm text-text border border-border-strong">
               {product.scale}
             </div>
           )}
         </div>
 
-        <div className="p-5 flex flex-col gap-1.5">
+        <div className={cn("flex flex-col gap-1.5", compact ? "p-3" : "p-4 sm:p-5")}>
           {product.brand && (
-            <span className="text-[10px] uppercase tracking-[0.2em] text-text-dim">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-text-dim line-clamp-1">
               {product.brand}
             </span>
           )}
-          <h3 className="font-display text-lg leading-tight text-text group-hover:text-gold transition-colors line-clamp-1">
+          <h3
+            className={cn(
+              "font-display leading-tight text-text group-hover:text-gold transition-colors line-clamp-1",
+              compact ? "text-sm" : "text-base sm:text-lg"
+            )}
+          >
             {product.name}
           </h3>
-          <div className="mt-2 flex items-end justify-between">
-            <p className="text-base font-semibold text-text">
+          <div className="mt-1 flex items-end justify-between gap-2">
+            <p className={cn("font-semibold text-text", compact ? "text-sm" : "text-base")}>
               {formatCurrencyOMR(product.price)}
             </p>
             {product.review_count > 0 && (
-              <span className="text-xs text-text-muted">
-                {product.rating.toFixed(1)} · {product.review_count} reviews
+              <span className="text-[11px] text-text-muted shrink-0">
+                ★ {product.rating.toFixed(1)}
               </span>
             )}
           </div>
         </div>
       </Link>
 
-      {/* Quick add */}
-      <button
-        onClick={() => !outOfStock && addItem(product, 1)}
-        disabled={outOfStock}
-        className={cn(
-          "absolute bottom-5 right-5 h-10 w-10 rounded-full flex items-center justify-center",
-          "bg-gold text-black opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0",
-          "transition-all duration-200 shadow-glow",
-          "disabled:bg-surface-elevated disabled:text-text-dim disabled:opacity-30 disabled:translate-y-0"
-        )}
-        aria-label="Add to cart"
-      >
-        <ShoppingBag className="h-4 w-4" />
-      </button>
+      <div className="absolute top-2.5 right-2.5">
+        <WishlistButton productId={product.id} size="sm" />
+      </div>
+
+      {!outOfStock && (
+        <QuickView product={product}>
+          <button
+            type="button"
+            className={cn(
+              "absolute top-2.5 right-12",
+              "inline-flex items-center justify-center h-8 w-8 sm:w-auto sm:px-3 sm:gap-1.5 rounded-full",
+              "border border-border-strong/60 bg-bg/70 backdrop-blur",
+              "text-[10px] uppercase tracking-[0.22em] text-text-muted",
+              "hover:border-gold/60 hover:text-gold transition-colors",
+              "sm:opacity-0 sm:group-hover:opacity-100 sm:transition-opacity sm:duration-200"
+            )}
+            aria-label={`Quick view: ${product.name}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Quick</span>
+          </button>
+        </QuickView>
+      )}
     </motion.div>
   );
 }
 
 function PlaceholderArt({ category }: { category: string }) {
-  const icon = { cars: "🚗", planes: "✈️", trucks: "🚚", bikes: "🏍️" }[category] ?? "•";
+  const icon = { cars: "▲", planes: "△", trucks: "▼", bikes: "◆" }[category] ?? "◇";
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface-elevated to-bg">
-      <span className="text-7xl opacity-20 grayscale">{icon}</span>
+      <span className="text-7xl opacity-10 text-gold font-display">{icon}</span>
+    </div>
+  );
+}
+
+export function ProductCardSkeleton({ compact }: { compact?: boolean }) {
+  return (
+    <div className="rounded-lg overflow-hidden bg-surface border border-border">
+      <div className={cn("skeleton", compact ? "aspect-square" : "aspect-[4/3]")} />
+      <div className={cn("flex flex-col gap-2", compact ? "p-3" : "p-5")}>
+        <div className="h-3 w-16 skeleton rounded" />
+        <div className="h-4 w-3/4 skeleton rounded" />
+        <div className="h-4 w-20 skeleton rounded mt-1" />
+      </div>
     </div>
   );
 }
