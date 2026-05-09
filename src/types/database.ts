@@ -7,7 +7,7 @@ export type Database = {
       products: {
         Row: Product;
         Insert: ProductInsert;
-        Update: Partial<ProductInsert>;
+        Update: Partial<Product>;
         Relationships: [];
       };
       categories: {
@@ -36,8 +36,22 @@ export type Database = {
       };
       reviews: {
         Row: Review;
-        Insert: Omit<Review, "id" | "created_at">;
-        Update: Partial<Omit<Review, "id" | "created_at">>;
+        Insert: {
+          product_id: string;
+          customer_id: string;
+          rating: number;
+          title?: string | null;
+          comment: string | null;
+          is_verified_purchase: boolean;
+        };
+        Update: {
+          product_id?: string;
+          customer_id?: string;
+          rating?: number;
+          title?: string | null;
+          comment?: string | null;
+          is_verified_purchase?: boolean;
+        };
         Relationships: [];
       };
       cart_items: {
@@ -164,6 +178,8 @@ export interface Review {
   is_verified_purchase: boolean;
   created_at: string;
 }
+
+export type ReviewInsert = Omit<Review, "id" | "created_at">;
 
 export interface CartItem {
   id: string;

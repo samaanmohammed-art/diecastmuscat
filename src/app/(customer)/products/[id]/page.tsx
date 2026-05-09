@@ -9,6 +9,7 @@ import { AddToCartButton } from "@/components/products/AddToCartButton";
 import { RatingStars } from "@/components/products/RatingStars";
 import { WishlistButton } from "@/components/products/WishlistButton";
 import { StickyPDPBar } from "@/components/products/StickyPDPBar";
+import { Reviews } from "@/components/products/Reviews";
 import { CategoryShelf } from "@/components/home/CategoryShelf";
 import { RecentlyViewedTracker } from "@/components/home/RecentlyViewedTracker";
 import { Badge } from "@/components/ui/badge";
@@ -227,6 +228,13 @@ export default async function ProductDetailPage({
               </section>
             </div>
           </div>
+
+          {/* Reviews */}
+          <Reviews
+            productId={product.id}
+            productRating={product.rating}
+            reviewCount={product.review_count}
+          />
 
           {/* Related — full-width horizontal shelf */}
           {related.length > 0 && (

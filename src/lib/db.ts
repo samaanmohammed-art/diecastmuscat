@@ -248,4 +248,82 @@ export async function fetchAllBrands(): Promise<string[]> {
   }
 }
 
+export interface ReviewWithCustomer {
+  id: string;
+  product_id: string;
+  customer_id: string;
+  rating: number;
+  title: string | null;
+  comment: string | null;
+  is_verified_purchase: boolean;
+  created_at: string;
+  customer_name: string | null;
+}
+
+export async function fetchReviews(
+  productId: string,
+  page = 1,
+  limit = 8
+): Promise<{ reviews: ReviewWithCustomer[]; total: number }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase
+      .from("reviews")
+      .select("*, customer:customers(name)", { count: "exact" })
+      .eq("product_id", productId)
+      .order("is_verified_purchase", { ascending: false })
+      .order("created_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+
+    const reviews = (data ?? []).map((r) => {
+      const row = r as Record<string, unknown>;
+      return {
+        id: row.id as string,
+        product_id: row.product_id as string,
+        customer_id: row.customer_id as string,
+        rating: row.rating as number,
+        title: row.title as string | null,
+        comment: row.comment as string | null,
+        is_verified_purchase: row.is_verified_purchase as boolean,
+        created_at: row.created_at as string,
+        customer_name: (row.customer as { name: string } | null)?.name ?? null,
+      } satisfies ReviewWithCustomer;
+    });
+
+    return { reviews, total: count ?? 0 };
+  } catch (err) {
+    console.error("[db.fetchReviews]", err);
+    return { reviews: [], total: 0 };
+  }
+}
+
+export async function fetchReviewStats(
+  productId: string
+): Promise<{ total: number; histogram: Record<number, number> }> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("rating")
+      .eq("product_id", productId);
+
+    if (error) throw error;
+
+    const histogram: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const row of (data ?? []) as Array<{ rating: number }>) {
+      if (row.rating >= 1 && row.rating <= 5) histogram[row.rating]++;
+    }
+
+    return { total: data?.length ?? 0, histogram };
+  } catch (err) {
+    console.error("[db.fetchReviewStats]", err);
+    return { total: 0, histogram: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+  }
+}
+
 export { applySort };
