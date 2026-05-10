@@ -8,6 +8,7 @@ import type { Product } from "@/types/database";
 import { formatCurrencyOMR, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { WishlistButton } from "./WishlistButton";
+import { CompareButton } from "./CompareButton";
 import { QuickView } from "./QuickView";
 
 interface ProductCardProps {
@@ -96,8 +97,9 @@ export function ProductCard({ product, className, priority, compact }: ProductCa
         </div>
       </Link>
 
-      <div className="absolute top-2.5 right-2.5">
+      <div className="absolute top-2.5 right-2.5 flex flex-col gap-1.5">
         <WishlistButton productId={product.id} size="sm" />
+        <CompareButton productId={product.id} className="hidden sm:flex" />
       </div>
 
       {!outOfStock && (

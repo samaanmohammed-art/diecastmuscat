@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { StickyCartBar } from "@/components/layout/StickyCartBar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { AIChat } from "@/components/shared/AIChat";
+import { CompareBar } from "@/components/products/CompareBar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -59,6 +60,7 @@ export default function RootLayout({
           <StickyCartBar />
           <BottomNav />
           <AIChat />
+          <CompareBar />
         </Providers>
       </body>
     </html>

@@ -326,4 +326,21 @@ export async function fetchReviewStats(
   }
 }
 
+export async function fetchProductsByIds(ids: string[]): Promise<Product[]> {
+  if (ids.length === 0) return [];
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .in("id", ids);
+    if (error) throw error;
+    const map = new Map((data as Product[]).map((p) => [p.id, p]));
+    return ids.flatMap((id) => (map.has(id) ? [map.get(id)!] : []));
+  } catch (err) {
+    console.error("[db.fetchProductsByIds]", err);
+    return [];
+  }
+}
+
 export { applySort };
