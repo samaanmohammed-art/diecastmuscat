@@ -11,7 +11,10 @@ import {
   CreditCard,
   Landmark,
   Loader2,
+  RotateCcw,
   ShieldCheck,
+  Sparkles,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -380,11 +383,22 @@ export function CheckoutForm({
                 <>Place order</>
               )}
             </Button>
-            <p className="flex items-center gap-2 text-[11px] text-text-dim">
-              <ShieldCheck className="h-3.5 w-3.5 text-gold/70" />
-              Encrypted checkout. No card data stored on our servers.
-            </p>
           </CartSummary>
+          {/* Trust strip */}
+          <div className="rounded-lg border border-border bg-surface/40 divide-y divide-border">
+            {[
+              { icon: Sparkles, text: "Every piece authenticated by our Muscat atelier" },
+              { icon: Truck, text: "Insured worldwide shipping in custom packaging" },
+              { icon: RotateCcw, text: "14-day exchange if the piece doesn't match its listing" },
+              { icon: ShieldCheck, text: "Your data is never stored or shared with third parties" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-start gap-3 px-4 py-3">
+                <Icon className="h-3.5 w-3.5 text-gold shrink-0 mt-0.5" />
+                <p className="text-[11px] text-text-muted leading-snug">{text}</p>
+              </div>
+            ))}
+          </div>
+
           <Link
             href="/cart"
             className="text-center text-xs uppercase tracking-[0.18em] text-text-muted hover:text-gold transition-colors"
