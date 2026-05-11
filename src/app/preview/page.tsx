@@ -41,6 +41,41 @@ const PREVIEWS = [
   },
 ] as const;
 
+const LANDING_DEMOS = [
+  {
+    slug: "landing-obsidian",
+    label: "A",
+    name: "Obsidian Vault",
+    feel: "Dark luxury · Warm gold",
+    description: "Black with animated gold particle shimmer. Italic hero fades up, horizontal shelf, 2-col curator grid, hairline gold CTA.",
+    palette: ["#0A0A0A", "#111111", "#D4AF37"],
+  },
+  {
+    slug: "landing-ivory",
+    label: "B",
+    name: "Ivory Atelier",
+    feel: "Editorial · Light",
+    description: "Cream off-white, dark text, gold rule above headline. Auction-house catalogue grid with generous whitespace.",
+    palette: ["#F5F0E8", "#1A1A1A", "#B08A20"],
+  },
+  {
+    slug: "landing-carbon",
+    label: "C",
+    name: "Carbon Series",
+    feel: "Industrial · Sporty",
+    description: "Cool dark with staggered ALL-CAPS letter animation. Red accent replaces gold. Timing-board feel.",
+    palette: ["#0D0D0F", "#141417", "#C0392B"],
+  },
+  {
+    slug: "landing-gallery",
+    label: "D",
+    name: "Gallery Edition",
+    feel: "Minimalist · Exhibition",
+    description: "Full-viewport hero image, minimal overlay. Products reveal one-by-one on scroll. Museum auction preview feel.",
+    palette: ["#080808", "#0E0E0E", "#F0F0EE"],
+  },
+] as const;
+
 export default function PreviewIndex() {
   return (
     <div className="min-h-screen px-6 lg:px-12 py-20 lg:py-32 bg-bg">
@@ -58,6 +93,57 @@ export default function PreviewIndex() {
             elements from each — and we'll evolve from there.
           </p>
         </header>
+
+        {/* ── New Landing Page Demos ── */}
+        <section className="mb-20">
+          <div className="mb-8">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-gold mb-3">
+              Landing Page Demos · Round II
+            </p>
+            <h2 className="font-display text-3xl md:text-4xl">Four animated landing pages.</h2>
+            <p className="mt-3 text-sm text-text-muted max-w-lg">
+              Full pages with Framer Motion animations — dark, light, sporty, exhibition. Pick a direction.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {LANDING_DEMOS.map((demo) => (
+              <Link
+                key={demo.slug}
+                href={`/preview/${demo.slug}`}
+                className="group relative block rounded-lg bg-surface border border-border hover:border-gold-muted transition-colors p-6 focus:outline-none focus:ring-2 focus:ring-gold/40"
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <span className="font-display text-5xl text-text-dim group-hover:text-gold transition-colors leading-none">
+                    {demo.label}
+                  </span>
+                  <div className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-border-strong group-hover:border-gold group-hover:bg-gold group-hover:text-black text-text-muted transition-all">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
+                </div>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-gold mb-1">{demo.feel}</p>
+                <h3 className="font-display text-xl sm:text-2xl group-hover:text-gold transition-colors">{demo.name}</h3>
+                <p className="mt-3 text-sm text-text-muted leading-relaxed">{demo.description}</p>
+                <div className="mt-5 flex items-center gap-2">
+                  {demo.palette.map((c) => (
+                    <span
+                      key={c}
+                      className="h-7 w-7 rounded-sm border border-border-strong"
+                      style={{ background: c }}
+                      aria-label={c}
+                    />
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="mb-8">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-gold mb-3">
+            Direction Studies · Round I
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl">Three homepage directions.</h2>
+        </div>
 
         <ol className="space-y-px">
           {PREVIEWS.map((p) => (
