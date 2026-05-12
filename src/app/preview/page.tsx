@@ -43,6 +43,22 @@ const PREVIEWS = [
 
 const LANDING_DEMOS = [
   {
+    slug: "porsche-vault",
+    label: "01",
+    name: "Porsche · Vault",
+    feel: "Light luxury · Museum vitrine",
+    description: "Single-piece PDP. Soft radial gradient, HUD overlay, scroll-triggered spoiler rise, weight count-up, X-Ray toggle, Muscat Vault microcopy. Native-app feel. The Collectcar direction.",
+    palette: ["#F5F4F1", "#E5E3DE", "#8B7E60"],
+  },
+  {
+    slug: "porsche-studio",
+    label: "02",
+    name: "Porsche · Studio",
+    feel: "Dark cinematic · Showroom at night",
+    description: "Same PDP, dark cinematic treatment. Garage spotlight under the car, Porsche red price, headlights fade on as you scroll. Mobile-first native app.",
+    palette: ["#1A1A1A", "#0A0A0A", "#D5001C"],
+  },
+  {
     slug: "landing-kinetic",
     label: "E",
     name: "Kinetic Brutalist",
@@ -124,9 +140,9 @@ export default function PreviewIndex() {
             <p className="text-[10px] uppercase tracking-[0.4em] text-gold mb-3">
               Landing Page Demos · Round II
             </p>
-            <h2 className="font-display text-3xl md:text-4xl">Seven animated landing pages.</h2>
+            <h2 className="font-display text-3xl md:text-4xl">Premium PDP demos + landing directions.</h2>
             <p className="mt-3 text-sm text-text-muted max-w-lg">
-              Brutalist, atmospheric, spatial, editorial, and luxury directions — all animated, all production-ready.
+              Mobile-first product detail pages (Porsche · Vault, Porsche · Studio) with HUD overlays, scroll animations, and native-app feel. Plus full landing directions below.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
