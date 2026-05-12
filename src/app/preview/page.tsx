@@ -43,6 +43,30 @@ const PREVIEWS = [
 
 const LANDING_DEMOS = [
   {
+    slug: "landing-kinetic",
+    label: "E",
+    name: "Kinetic Brutalist",
+    feel: "Electric yellow · Brutal type",
+    description: "Mustard yellow on near-black. Marquee tickers, draggable category cards, oversized outlined type, lot-number editorial table. Balenciaga meets Sotheby's.",
+    palette: ["#0A0A0A", "#F5D300", "#FAFAF7"],
+  },
+  {
+    slug: "landing-aurora",
+    label: "F",
+    name: "Aurora Glass",
+    feel: "Spatial · Atmospheric",
+    description: "Aurora mesh gradient background, frosted glass cards, mouse-parallax depth. Apple Vision Pro aesthetic. Soft violet/cyan/rose.",
+    palette: ["#0F0A1F", "#A78BFA", "#67E8F9"],
+  },
+  {
+    slug: "landing-spatial",
+    label: "G",
+    name: "3D Spatial",
+    feel: "Tilt cards · Cosmic depth",
+    description: "Deep cosmic blue-black. 3D-tilt product cards respond to cursor, scroll-tied perspective, SVG annotation callouts. Like Apple iPad Pro page.",
+    palette: ["#070A14", "#5E9EFF", "#F0F2F8"],
+  },
+  {
     slug: "landing-obsidian",
     label: "A",
     name: "Obsidian Vault",
@@ -100,9 +124,9 @@ export default function PreviewIndex() {
             <p className="text-[10px] uppercase tracking-[0.4em] text-gold mb-3">
               Landing Page Demos · Round II
             </p>
-            <h2 className="font-display text-3xl md:text-4xl">Four animated landing pages.</h2>
+            <h2 className="font-display text-3xl md:text-4xl">Seven animated landing pages.</h2>
             <p className="mt-3 text-sm text-text-muted max-w-lg">
-              Full pages with Framer Motion animations — dark, light, sporty, exhibition. Pick a direction.
+              Brutalist, atmospheric, spatial, editorial, and luxury directions — all animated, all production-ready.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
