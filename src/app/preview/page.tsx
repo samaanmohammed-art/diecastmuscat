@@ -43,6 +43,14 @@ const PREVIEWS = [
 
 const LANDING_DEMOS = [
   {
+    slug: "flagship",
+    label: "3D",
+    name: "The Vault — 3D Flagship",
+    feel: "Real 3D · Interactive · Awwwards-grade",
+    description: "A real Three.js supercar you can spin. Cinematic scale-reveal intro, tilt-to-hold lighting (gyroscope on mobile), scroll-driven detail tour, live paint configurator. Works on phone, tablet, PC.",
+    palette: ["#ECEAE4", "#B81D24", "#1A1916"],
+  },
+  {
     slug: "porsche-vault",
     label: "01",
     name: "Porsche · Vault",
