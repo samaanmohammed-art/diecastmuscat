@@ -43,6 +43,14 @@ const PREVIEWS = [
 
 const LANDING_DEMOS = [
   {
+    slug: "cabinet",
+    label: "00",
+    name: "The Cabinet",
+    feel: "Clean · Classy · Auction-catalogue",
+    description: "A collector's lit display cabinet. Cream editorial hero with a glass case, horizontal category shelves, lot-numbered cards, quick-look modal, curator's selection and limited editions. Mobile-first.",
+    palette: ["#F1EDE4", "#9A7B4F", "#1C1A16"],
+  },
+  {
     slug: "flagship",
     label: "3D",
     name: "The Vault — 3D Flagship",
